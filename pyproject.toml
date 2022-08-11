@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "rivals"
+version = "0.1.0"
+description = "Installing and running rivals to CLAM-CAKES"
+authors = [
+    "Najib Ishaq <najib_ishaq@zoho.com>",
+]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+hnswlib = [
+    { git = "https://github.com/nmslib/hnswlib.git" },
+]
+faiss-cpu = "~1.7"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
