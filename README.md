@@ -22,3 +22,9 @@ pip install --upgrade pip setuptools wheel
 ```bash
 pip install -e .
 ```
+
+4. Run it from the terminal:
+
+```bash
+python -m rivals
+```
