@@ -11,6 +11,7 @@ def run(train, test, k):
     
     
     n, d = train.shape
+    test_n, test_d = test.shape
 
     # Generating sample data
     # data = numpy.float32(numpy.random.random((num_elements, dim)))
@@ -51,5 +52,6 @@ def run(train, test, k):
     logger.info(f"Search speed/quality trade-off parameter: ef={p.ef}")
     logger.info(f"Indexing time:{indexing_elapsed = :.2e}")
     logger.info(f"Search time:{search_elapsed = :.2e}")
+    logger.info(f"Search time per query:{search_elapsed/test_n = :.2e}")
 
     return
