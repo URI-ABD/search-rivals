@@ -7,8 +7,7 @@ from .utils import helpers
 logger = helpers.make_logger(__name__)
 
 
-def run(train, test, k):
-    
+def run(train, test, true_idx, true_dist, k):
     
     n, d = train.shape
     test_n, test_d = test.shape
@@ -22,14 +21,14 @@ def run(train, test, k):
 
     indexing_start = time.perf_counter()
     # Initializing index - the maximum number of elements should be known beforehand
-    p.init_index(max_elements=n, ef_construction=200, M=16)
+    p.init_index(max_elements=n, ef_construction=1000, M=16)
     indexing_elapsed = time.perf_counter() - indexing_start
 
     # # Element insertion (can be called several times):
     p.add_items(train, ids)
 
     # # Controlling the recall by setting ef:
-    p.set_ef(200)  # ef should always be > k
+    p.set_ef(n)  # ef should always be > k
 
 
     search_start = time.perf_counter()
@@ -37,10 +36,16 @@ def run(train, test, k):
     labels, distances = p.knn_query(test, k)
     search_elapsed = time.perf_counter() - search_start
 
-    # # Index objects support pickling
-    # # WARNING: serialization via pickle.dumps(p) or p.__getstate__() is NOT thread-safe with p.add_items method!
-    # # Note: ef parameter is included in serialization; random number generator is initialized with random_seed on Index load
-    # p = pickle.loads(pickle.dumps(p))  # creates a copy of index p using pickle round-trip
+
+    # Measure recall
+    # This is all wrong, it doesn't separate labels per query
+    correct = 0
+    for i in range(test_n): # for each query
+        for label in labels[i]:
+            for correct_label in true_idx[i]:
+                if label == correct_label:
+                    correct += 1
+                    break
 
     # todo recall from scikit-learn
     # todo faiss-ivf, faiss-hnsw, faiss...
@@ -53,5 +58,6 @@ def run(train, test, k):
     logger.info(f"Indexing time:{indexing_elapsed = :.2e}")
     logger.info(f"Search time:{search_elapsed = :.2e}")
     logger.info(f"Search time per query:{search_elapsed/test_n = :.2e}")
+    logger.info(f"Recall:{float(correct)/(k*test_n) = :.2e}")
 
     return

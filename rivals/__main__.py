@@ -8,9 +8,9 @@ logging.basicConfig(
     datefmt='%d-%b-%y %H:%M:%S',
 )
 
-train, test = dataset.get_dataset() # placeholder for now, just fmnist
+train, test, true_idx, true_dist = dataset.get_dataset() # placeholder for now, just fmnist
 
-hnsw_bench.run(train, test, 10)
-faiss_bench.run(train, test, 10)
+hnsw_bench.run(train, test, true_idx, true_dist, 100)
+faiss_bench.run(train, test, true_idx, true_dist, 100)
 
 
