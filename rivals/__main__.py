@@ -31,12 +31,13 @@ for name in NAMES:
     train, test, true_idx, true_dist = dataset.get_dataset(data_path)
     logger.info(f'Using {name} data with shape {train.shape} and {test.shape[0]} queries ...')
 
-    hnsw_bench.run(train, test, true_idx, true_dist, 100)
+    # hnsw_bench.run(train, test, true_idx, true_dist, 100)
     # faiss_nc at 1 is perfect recall
     # larger values speed up queries at the cost of recall
     # even 2 is at best 93.6% recall on fashion-mnist
     faiss_nc = 1 # perfect recall
-    faiss_bench.run(train, test, true_idx, true_dist, 100, faiss_nc)
+    faiss_nprobe = 1 # does not seem to help when nc is 1. Helps recall when nc is higher.
+    faiss_bench.run(train, test, true_idx, true_dist, 100, faiss_nc, faiss_nprobe)
 
 logger.info('')
 logger.info('Done!')

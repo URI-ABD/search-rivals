@@ -8,7 +8,7 @@ from .utils import helpers
 logger = helpers.make_logger(__name__)
 
 
-def run(train, test, true_idx, true_dist, k, nc):
+def run(train, test, true_idx, true_dist, k, nc, nprobe):
     n, d = train.shape
     test_n, test_d = test.shape
     assert (test_d == d)
@@ -21,10 +21,11 @@ def run(train, test, true_idx, true_dist, k, nc):
     index = faiss.IndexIVFFlat(quantizer, d, nc, faiss.METRIC_L2)
     index.train(train)
     index.add(train)
+    index.nprobe = nprobe
     indexing_elapsed = time.perf_counter() - indexing_start
     # done indexing
 
-    logger.info(f"Parameters passed to constructor:  dim={d}")
+    logger.info(f"Parameters passed to constructor:  dim={d}, nc={nc}, nprobe={nprobe}")
     logger.info(f"Indexing time: {indexing_elapsed:.2e}")
 
     # begin search
