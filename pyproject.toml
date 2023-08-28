@@ -13,7 +13,7 @@ hnswlib = [
     { git = "https://github.com/nmslib/hnswlib.git" },
 ]
 faiss-cpu = "~1.7"
-h5py = "~3.7"
+h5py = "^3.7"
 
 [tool.poetry.dev-dependencies]
 

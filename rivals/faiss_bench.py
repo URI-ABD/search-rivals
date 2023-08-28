@@ -30,7 +30,8 @@ def run(train, test, true_idx, true_dist, k, nc, nprobe):
 
     # begin search
     search_start = time.perf_counter()
-    distances, labels = index.search(test, k)  # search returns distances and indices
+    # distances, labels = index.search(test, k)  # search returns distances and indices
+    _, distances, labels = index.range_search(test, 10.0)  # search returns distances and indices
     search_elapsed = time.perf_counter() - search_start
     # done searching
 
