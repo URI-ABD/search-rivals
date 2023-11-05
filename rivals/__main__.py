@@ -1,10 +1,13 @@
 import logging
+import sys
+import numpy as np
 
 from rivals import faiss_bench
 from rivals import hnsw_bench
-from rivals.utils import dataset
+from rivals import mrpt_bench
+# from rivals.utils import dataset
 from rivals.utils import helpers
-from rivals.utils import paths
+# from rivals.utils import paths
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s",
@@ -13,31 +16,50 @@ logging.basicConfig(
 logger = helpers.make_logger('main', 'INFO')
 
 NAMES = {
-    "fashion-mnist-784-euclidean",
-    "fashion-mnist",
-    "sift",
-    "gist",
+    "deep-image": "cosine",
+    "fashion-mnist": "euclidean",
+    "gist": "euclidean",
+    "glove-25": "cosine",
+    "glove-50": "cosine",
+    "glove-100": "cosine",
+    "glove-200": "cosine",
+    "mnist": "euclidean",
+    "sift": "euclidean",
+    "lastfm": "cosine",
+    "nytimes": "cosine"
 }
 
-for name in NAMES:
-    logger.info('')
+RIVALS = {
+    "faiss",
+    "hnsw",
+    "mrpt"
+}
 
-    data_path = paths.DATA_ROOT.joinpath(f'{name}.hdf5')
-    if not data_path.exists():
-        logger.info(f'Could not find file at {data_path}. Skipping ...')
-        continue
+usage = f"{sys.argv[0]} datadir dataset rival k"
+if len(sys.argv) != 5:
+    sys.exit(usage)
 
-    logger.info(f'Reading {name} data ...')
-    train, test, true_idx, true_dist = dataset.get_dataset(data_path)
-    logger.info(f'Using {name} data with shape {train.shape} and {test.shape[0]} queries ...')
+datadir = sys.argv[1]
+dataset = sys.argv[2]
+rival = sys.argv[3]
+k = int(sys.argv[4])
 
-    # hnsw_bench.run(train, test, true_idx, true_dist, 100)
-    # faiss_nc at 1 is perfect recall
-    # larger values speed up queries at the cost of recall
-    # even 2 is at best 93.6% recall on fashion-mnist
-    faiss_nc = 1 # perfect recall
-    faiss_nprobe = 1 # does not seem to help when nc is 1. Helps recall when nc is higher.
-    faiss_bench.run(train, test, true_idx, true_dist, 100, faiss_nc, faiss_nprobe)
+
+
+
+target = np.load(f"{datadir}/{dataset}-train.npy")
+queries = np.load(f"{datadir}/{dataset}-test.npy")
+
+logger.info(f'Using {dataset} data with shape {target.shape} and {queries.shape[0]} queries ...')
+
+if rival == "faiss":
+    faiss_bench.run(target, queries, k)
+elif rival == "hnsw":
+    hnsw_bench.run(target, queries, k)
+elif rival == "mrpt":
+    mrpt_bench.run(target, queries, k)
+else:
+    print(f"Unknown rival {rival}")
 
 logger.info('')
 logger.info('Done!')
